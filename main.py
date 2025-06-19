@@ -10,8 +10,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.shloakh.com/"],  # You can replace "*" with your domain like "https://shloakh.com"
     allow_credentials=True,
-    allow_methods=["https://www.shloakh.com/"],
-    allow_headers=["https://www.shloakh.com/"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
