@@ -1,0 +1,77 @@
+[
+  {
+    "symptom": "constipation",
+    "dosha": "Vata",
+    "remedy": "Take Triphala powder with warm water at bedtime"
+  },
+  {
+    "symptom": "acidity",
+    "dosha": "Pitta",
+    "remedy": "Take Amla juice in the morning"
+  },
+  {
+    "symptom": "gas",
+    "dosha": "Vata",
+    "remedy": "Chew ajwain seeds with warm water"
+  },
+  {
+    "symptom": "cold",
+    "dosha": "Kapha",
+    "remedy": "Take Tulsi tea with ginger and honey"
+  },
+  {
+    "symptom": "headache",
+    "dosha": "Pitta",
+    "remedy": "Apply Brahmi oil on the scalp before bed"
+  },
+  {
+    "symptom": "cough",
+    "dosha": "Kapha",
+    "remedy": "Use Sitopaladi churna with honey"
+  },
+  {
+    "symptom": "fever",
+    "dosha": "Pitta",
+    "remedy": "Drink Coriander seed decoction"
+  },
+  {
+    "symptom": "indigestion",
+    "dosha": "Vata",
+    "remedy": "Take Hingwashtak churna after meals"
+  },
+  {
+    "symptom": "insomnia",
+    "dosha": "Vata",
+    "remedy": "Drink Ashwagandha milk at bedtime"
+  },
+  {
+    "symptom": "hair fall",
+    "dosha": "Pitta",
+    "remedy": "Apply Bhringraj oil regularly"
+  },
+  {
+    "symptom": "dandruff",
+    "dosha": "Kapha",
+    "remedy": "Use neem oil and wash with reetha water"
+  },
+  {
+    "symptom": "joint pain",
+    "dosha": "Vata",
+    "remedy": "Massage with Mahanarayan oil and apply heat"
+  },
+  {
+    "symptom": "stress",
+    "dosha": "Vata",
+    "remedy": "Take Brahmi or Shankhpushpi syrup daily"
+  },
+  {
+    "symptom": "eye strain",
+    "dosha": "Pitta",
+    "remedy": "Wash eyes with Triphala decoction"
+  },
+  {
+    "symptom": "skin allergy",
+    "dosha": "Pitta",
+    "remedy": "Apply sandalwood paste and take neem internally"
+  }
+]
