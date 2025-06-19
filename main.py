@@ -8,7 +8,9 @@ import json
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.shloakh.com/"],  # You can replace "*" with your domain like "https://shloakh.com"
+    allow_origins=["https://www.shloakh.com", "http://localhost", "*"],
+
+      # You can replace "*" with your domain like "https://shloakh.com"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
