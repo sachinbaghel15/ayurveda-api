@@ -1,7 +1,19 @@
+
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 import json
 
+
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://www.shloakh.com/"],  # You can replace "*" with your domain like "https://shloakh.com"
+    allow_credentials=True,
+    allow_methods=["https://www.shloakh.com/"],
+    allow_headers=["https://www.shloakh.com/"],
+)
+
 
 # Load remedies from the JSON file
 with open("remedies.json", "r", encoding="utf-8") as file:
