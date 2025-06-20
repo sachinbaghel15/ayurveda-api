@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import stripe
+import os
 
 app = FastAPI()
 
-# ✅ CORS Setup
+# ✅ CORS Configuration for frontend (shloakh.com)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.shloakh.com"],
@@ -13,33 +15,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Load Remedies
+# ✅ Load Ayurveda remedies from local JSON file
 with open("remedies.json", "r", encoding="utf-8") as file:
     remedies = json.load(file)
 
-# ✅ Load API Keys
-def load_keys():
-    with open("api_keys.json", "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def save_keys(keys):
-    with open("api_keys.json", "w", encoding="utf-8") as f:
-        json.dump(keys, f, indent=2)
-
-# ✅ Validate API Key + Track Usage
-def validate_key(api_key):
-    keys = load_keys()
-    for user in keys:
-        if user["key"] == api_key:
-            if user["usage"] < user["limit"]:
-                user["usage"] += 1
-                save_keys(keys)
-                return True
-            else:
-                raise HTTPException(status_code=429, detail="API usage limit exceeded.")
-    raise HTTPException(status_code=401, detail="Invalid API key.")
-
-# ✅ Remedy Search
+# ✅ Function to find remedy by symptom
 def get_remedy(symptom):
     for item in remedies:
         if item["symptom"].lower() == symptom.lower():
@@ -50,8 +30,37 @@ def get_remedy(symptom):
         "dosha": "Unknown"
     }
 
-# ✅ API Endpoint
+# ✅ Remedy endpoint
 @app.get("/remedy")
-def remedy(symptom: str = Query(...), key: str = Query(...)):
-    validate_key(key)
+def remedy(symptom: str = Query(..., description="Enter a symptom like 'constipation'")):
     return get_remedy(symptom)
+
+
+# ✅ Stripe Payment Integration
+
+# Load Stripe secret key from environment (set in render.yaml)
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+# ✅ Create Stripe checkout session (key is optional now)
+@app.get("/create-checkout-session")
+def create_checkout_session(key: str = Query(None)):
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "inr",
+                    "product_data": {
+                        "name": "Ayurveda API – Pro Plan",
+                    },
+                    "unit_amount": 49900,  # ₹499 in paisa
+                },
+                "quantity": 1,
+            }],
+            mode="payment",
+            success_url="https://www.shloakh.com/success",
+            cancel_url="https://www.shloakh.com/cancel",
+        )
+        return {"url": session.url}
+    except Exception as e:
+        return {"error": str(e)}
