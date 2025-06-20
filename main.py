@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import json
+import difflib  # for fuzzy matching
 import stripe
 import os
 
 app = FastAPI()
 
-# CORS Configuration
+# ✅ CORS settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.shloakh.com"],
@@ -15,30 +16,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load Ayurveda remedies from local JSON file
+# ✅ Load remedies data from JSON file
 with open("remedies.json", "r", encoding="utf-8") as file:
     remedies = json.load(file)
 
-# Find remedy by symptom
+# ✅ Helper: Normalize text
+def normalize(text):
+    return text.lower().strip()
+
+# ✅ Remedy search logic
 def get_remedy(symptom):
+    normalized_symptom = normalize(symptom)
+
+    # 1. Exact or partial match
     for item in remedies:
-        if item["symptom"].lower() == symptom.lower():
-            return item
+        if normalized_symptom in normalize(item["symptom"]):
+            return {
+                "symptom": item["symptom"],
+                "description": item.get("description", "No description available."),
+                "remedy": item.get("remedy", "No remedy found."),
+                "dosha": item.get("dosha", "Unknown"),
+                "herbs": item.get("herbs", "Not specified"),
+                "prevention": item.get("prevention", "No tips available.")
+            }
+
+    # 2. Fuzzy matching for suggestions
+    all_symptoms = [normalize(r["symptom"]) for r in remedies]
+    close_matches = difflib.get_close_matches(normalized_symptom, all_symptoms)
+
     return {
         "symptom": symptom,
-        "remedy": "No remedy found",
-        "dosha": "Unknown"
+        "remedy": "❌ No exact match found.",
+        "suggested_matches": close_matches if close_matches else ["Try different symptom keywords"]
     }
 
-# Remedy endpoint
+# ✅ API route for remedies
 @app.get("/remedy")
 def remedy(symptom: str = Query(..., description="Enter a symptom like 'constipation'")):
     return get_remedy(symptom)
 
-# Stripe API key from environment variable
+# ✅ Stripe payment integration
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-# Create Stripe checkout session
 @app.get("/create-checkout-session")
 def create_checkout_session():
     try:
@@ -50,7 +69,7 @@ def create_checkout_session():
                     "product_data": {
                         "name": "Ayurveda API – Pro Plan",
                     },
-                    "unit_amount": 49900,  # ₹499 in paisa
+                    "unit_amount": 49900,  # ₹499 in paise
                 },
                 "quantity": 1,
             }],
