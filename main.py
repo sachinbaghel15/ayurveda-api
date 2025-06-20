@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-# ✅ CORS Configuration for frontend (shloakh.com)
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://www.shloakh.com"],
@@ -15,11 +15,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Load Ayurveda remedies from local JSON file
+# Load Ayurveda remedies from local JSON file
 with open("remedies.json", "r", encoding="utf-8") as file:
     remedies = json.load(file)
 
-# ✅ Function to find remedy by symptom
+# Find remedy by symptom
 def get_remedy(symptom):
     for item in remedies:
         if item["symptom"].lower() == symptom.lower():
@@ -30,20 +30,17 @@ def get_remedy(symptom):
         "dosha": "Unknown"
     }
 
-# ✅ Remedy endpoint
+# Remedy endpoint
 @app.get("/remedy")
 def remedy(symptom: str = Query(..., description="Enter a symptom like 'constipation'")):
     return get_remedy(symptom)
 
-
-# ✅ Stripe Payment Integration
-
-# Load Stripe secret key from environment (set in render.yaml)
+# Stripe API key from environment variable
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-# ✅ Create Stripe checkout session (key is optional now)
+# Create Stripe checkout session
 @app.get("/create-checkout-session")
-def create_checkout_session(key: str = Query(None)):
+def create_checkout_session():
     try:
         session = stripe.checkout.Session.create(
             payment_method_types=["card"],
@@ -58,8 +55,8 @@ def create_checkout_session(key: str = Query(None)):
                 "quantity": 1,
             }],
             mode="payment",
-            success_url="https://www.shloakh.com/success",
-            cancel_url="https://www.shloakh.com/cancel",
+            success_url="https://www.shloakh.com/p/success.html",
+            cancel_url="https://www.shloakh.com/p/cancel.html",
         )
         return {"url": session.url}
     except Exception as e:
